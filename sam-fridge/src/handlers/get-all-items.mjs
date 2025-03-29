@@ -4,7 +4,14 @@
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
 import { DynamoDBDocumentClient, ScanCommand } from '@aws-sdk/lib-dynamodb';
 const client = new DynamoDBClient({});
-const ddbDocClient = DynamoDBDocumentClient.from(client);
+let ddbDocClient = DynamoDBDocumentClient.from(client);
+
+// redirect dynamodb if this is ran locally
+if (process.env.AWS_SAM_LOCAL) {
+    ddbDocClient = DynamoDBDocumentClient.from(new DynamoDBClient({
+        endpoint: "http://172.22.0.2:8000"
+    }));
+}
 
 // Get the DynamoDB table name from environment variables
 const tableName = process.env.SAMPLE_TABLE;
@@ -23,7 +30,7 @@ export const getAllItemsHandler = async (event) => {
     // https://docs.aws.amazon.com/AWSJavaScriptSDK/latest/AWS/DynamoDB/DocumentClient.html#scan-property
     // https://docs.aws.amazon.com/amazondynamodb/latest/APIReference/API_Scan.html
     var params = {
-        TableName : tableName
+        TableName: tableName
     };
 
     try {

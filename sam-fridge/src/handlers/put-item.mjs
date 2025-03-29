@@ -4,7 +4,15 @@
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
 import { DynamoDBDocumentClient, PutCommand } from '@aws-sdk/lib-dynamodb';
 const client = new DynamoDBClient({});
-const ddbDocClient = DynamoDBDocumentClient.from(client);
+
+let ddbDocClient = DynamoDBDocumentClient.from(client);
+
+// redirect dynamodb if this is ran locally
+if (process.env.AWS_SAM_LOCAL) {
+    ddbDocClient = DynamoDBDocumentClient.from(new DynamoDBClient({
+        endpoint: "http://172.22.0.2:8000"
+    }));
+}
 
 // Get the DynamoDB table name from environment variables
 const tableName = process.env.SAMPLE_TABLE;
@@ -27,16 +35,16 @@ export const putItemHandler = async (event) => {
     // Creates a new item, or replaces an old item with a new item
     // https://docs.aws.amazon.com/AWSJavaScriptSDK/latest/AWS/DynamoDB/DocumentClient.html#put-property
     var params = {
-        TableName : tableName,
-        Item: { id : id, name: name }
+        TableName: tableName,
+        Item: { id: id, name: name }
     };
 
     try {
         const data = await ddbDocClient.send(new PutCommand(params));
         console.log("Success - item added or updated", data);
-      } catch (err) {
+    } catch (err) {
         console.log("Error", err.stack);
-      }
+    }
 
     const response = {
         statusCode: 200,
