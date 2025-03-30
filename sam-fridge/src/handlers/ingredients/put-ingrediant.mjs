@@ -1,5 +1,5 @@
-import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
-import { DynamoDBDocumentClient, PutItemCommand } from "@aws-sdk/lib-dynamodb";
+import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
+import { DynamoDBDocumentClient, PutItemCommand } from '@aws-sdk/lib-dynamodb';
 
 const client = new DynamoDBClient({});
 let ddbDocClient = DynamoDBDocumentClient.from(client);
@@ -8,11 +8,11 @@ let ddbDocClient = DynamoDBDocumentClient.from(client);
 if (process.env.AWS_SAM_LOCAL) {
   ddbDocClient = DynamoDBDocumentClient.from(
     new DynamoDBClient({
-      endpoint: "http://172.22.0.2:8000",
+      endpoint: 'http://172.22.0.2:8000',
     })
   );
 }
-const TABLE_NAME = process.env.TABLE_NAME || "Ingredients";
+const TABLE_NAME = process.env.TABLE_NAME || 'Ingredients';
 
 export const handler = async (event) => {
   try {
@@ -53,16 +53,16 @@ export const handler = async (event) => {
     return {
       statusCode: 200,
       body: JSON.stringify({
-        message: "Ingredient added successfully",
+        message: 'Ingredient added successfully',
         ingredient: item,
       }),
     };
   } catch (error) {
-    console.error("Error putting ingredient:", error);
+    console.error('Error putting ingredient:', error);
     return {
       statusCode: 500,
       body: JSON.stringify({
-        message: "Error adding ingredient",
+        message: 'Error adding ingredient',
         error: error.message,
       }),
     };
