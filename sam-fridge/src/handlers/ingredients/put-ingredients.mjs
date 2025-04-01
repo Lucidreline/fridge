@@ -1,5 +1,5 @@
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
-import { DynamoDBDocumentClient, PutItemCommand } from '@aws-sdk/lib-dynamodb';
+import { DynamoDBDocumentClient, PutCommand } from '@aws-sdk/lib-dynamodb';
 
 const client = new DynamoDBClient({});
 let ddbDocClient = DynamoDBDocumentClient.from(client);
@@ -8,13 +8,13 @@ let ddbDocClient = DynamoDBDocumentClient.from(client);
 if (process.env.AWS_SAM_LOCAL) {
   ddbDocClient = DynamoDBDocumentClient.from(
     new DynamoDBClient({
-      endpoint: 'http://172.22.0.2:8000',
+      endpoint: 'http://172.23.0.2:8000',
     })
   );
 }
-const TABLE_NAME = process.env.TABLE_NAME || 'Ingredients';
+const TABLE_NAME = process.env.SAMPLE_TABLE;
 
-export const handler = async (event) => {
+export const putIngredientHandler = async (event) => {
   try {
     // Parse the incoming request body
     const body = JSON.parse(event.body);
@@ -41,7 +41,7 @@ export const handler = async (event) => {
     };
 
     // Prepare the DynamoDB PutItem command
-    const command = new PutItemCommand({
+    const command = new PutCommand({
       TableName: TABLE_NAME,
       Item: item,
     });
